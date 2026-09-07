@@ -1,47 +1,35 @@
-# validation.py
-# I declare that my work contains no examples of misconduct, such  as plagarism, or collusion
-# Any code taken from other sources is referenced within my code solution
-# Student ID: w20457325
-# Date: 23/11/2023
-# Define a function to validate the credits entered
-def validate_credits():
+"""Input validation for university progression credits."""
+
+VALID_CREDITS = frozenset({0, 20, 40, 60, 80, 100, 120})
+TOTAL_CREDITS = 120
+
+
+def _read_credit(label, input_fn=input, output_fn=print):
+    """Read one credit value and keep prompting until it is valid."""
     while True:
-            big_list = [] #Initialise an empty list to store the entered credits
-            valid_ranges = ["0", "20", "40", "60", "80", "100", "120"] #These are the valid credit ranges
+        value = input_fn(f"Enter the number of university credits {label}: ").strip()
+        try:
+            credit = int(value)
+        except ValueError:
+            output_fn("Please enter an integer.")
+            continue
 
-#Validate the input until it falls within the valid ranges
-            p = (input("Enter the number of university credits that you have passed at: ")) #p is the input for the pass credits
-            while p not in valid_ranges:
-                 if p.isdigit() == False:
-                      print ("Please enter integer") #these lines of code makes sure that the user enters an integer and that the input is within range
-                 elif p not in valid_ranges:
-                      print ("Out of Range")
-                 p = (input("Enter the number of university credits that you have passed at: ")) # The user is required to input again if the conditions are not met 
-            p = int(p)
+        if credit not in VALID_CREDITS:
+            output_fn("Out of range. Choose 0, 20, 40, 60, 80, 100, or 120.")
+            continue
+        return credit
 
-#Validate the input until it falls within the valid ranges
-            d = (input("Enter the number of university credits that you have deferred at: ")) #d is the input for the defer credits
-            while d not in valid_ranges:
-                 if d.isdigit() == False:
-                      print ("Please enter integer") #these lines of code makes sure that the user enters an integer and that the input is within range
-                 elif d not in valid_ranges:
-                      print ("Out of Range")
-                 d = (input("Enter the number of university credits that you have passed at: ")) # The user is required to input again if the conditions are not met 
-            d = int(d)
-#Validate the input until it falls within the valid ranges
-            f = (input("Enter the number of university credits that you have failed at: ")) #f is the input for the fail credits
-            while f not in valid_ranges:
-                 if f.isdigit() == False:
-                      print ("Please enter integer") #these lines of code makes sure that the user enters an integer and that the input is within range
-                 elif f not in valid_ranges:
-                      print ("Out of Range")
-                 f = (input("Enter the number of university credits that you have passed at: ")) # The user is required to input again if the conditions are not met 
-            f = int(f)
-# The following makes sure that the total number of credits is 120, ensuring that the inputs by the user are valid
-            if p + d + f == 120:
-                print ("Total of credits is correct value")
-                return [p, d, f]
-            else:
-                    print("Total Incorrect")
-                    return False
-                    #Total incorrect shall be displayed if the total credits is wrong and so it would be false
+
+def validate_credits(input_fn=input, output_fn=print):
+    """Return pass, defer, and fail credits whose total is exactly 120."""
+    while True:
+        passed = _read_credit("passed at", input_fn, output_fn)
+        deferred = _read_credit("deferred at", input_fn, output_fn)
+        failed = _read_credit("failed at", input_fn, output_fn)
+        credits = [passed, deferred, failed]
+
+        if sum(credits) == TOTAL_CREDITS:
+            output_fn("Total of credits is correct value.")
+            return credits
+
+        output_fn("Total incorrect. Please enter all three values again.")
